@@ -30,19 +30,30 @@ async function getRepos(profile) {
   return repo;
 }
 
+const Selector = (className) => document.querySelector(className);
+
 document.getElementById("search").addEventListener("submit", async (e) => {
   e.preventDefault();
   const username = document.getElementById("findByUsername").value;
 
-  const profile = await getUser(username);
+  if (username.length > 0) {
+    Selector(".loader").style.display = "block";
+    Selector(".user-details").style.display = "none";
 
-  // profile.repos_url
-  const repos = await getRepos(profile);
-  // console.log(repos);
+    const profile = await getUser(username);
+    Selector(".loader").style.display = "none";
 
-  showProfile(profile);
-  showRepos(repos);
-  console.log(profile);
+    if (profile.message === "Not Found") {
+      Selector(".notFound").style.display = "block";
+    } else {
+      Selector(".notFound").style.display = "none";
+      const repos = await getRepos(profile);
+      Selector(".user-details").style.display = "flex";
+
+      showProfile(profile);
+      showRepos(repos);
+    }
+  }
 });
 
 function showRepos(repos) {
